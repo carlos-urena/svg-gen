@@ -7,4 +7,4 @@ Once a polygon is created, it is projected to 2D by using a camera (parallel for
 
 There are various figures defined in `figures.cpp` file. A figure (see class `Figure`) is a set of objects. When a figure is written to a SVG, the full file is created, including header (with the bounding box), and all SVG tags.
 
-A makefile is provided, which outputs the svg figures (target `allsvgs`). The makefile can also convert SVG to PNG or PDF, by the application `rsvg-convert` (available in macOS). 
+A makefile is provided, which outputs the svg figures (target `allsvgs`). The makefile can also convert SVG to PNG or PDF, by using the application `rsvg-convert` (available in macOS). 
