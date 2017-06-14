@@ -14,4 +14,14 @@ A makefile is provided, which outputs the svg figures (target `allsvgs`). The ma
 
 Here are some sample images obtained with the code:
 
+#### Figure 2
+![Figure 2](sample-images/fig2.png)
+
+#### Figure 3
 ![Figure 3](sample-images/fig3.png)
+
+#### Figure 4
+![Figure 4](sample-images/fig4.png)
+
+#### Figure 5
+![Figure 3](sample-images/fig5.png)
