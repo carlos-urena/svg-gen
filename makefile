@@ -2,13 +2,14 @@
 .PHONY: clean, allpdfs, allsvgs, pngs, x1,x2,x3,x4,x5,x6, y1,y2,y3,y4,y5,y6, z1,z2,z3,z4,z5,z6
 
 
-srcs:=       $(wildcard *.cpp)
-headers:=    $(wildcard *.hpp)
-objects:=    $(addsuffix .o, $(basename $(srcs)))
-exefile:=    main
-comp:=       clang++
-comp_flags:= -std=c++11 -Wfatal-errors
-converter:=  rsvg-convert -a
+srcs        := $(wildcard *.cpp)
+headers     := $(wildcard *.hpp)
+objects     := $(addsuffix .o, $(basename $(srcs)))
+exefile     := main
+comp        := clang++
+comp_flags  := -std=c++11 -Wfatal-errors
+converter   := rsvg-convert -a
+pngs_width  := 512
 
 uname:=$(shell uname -s)
 
@@ -46,7 +47,7 @@ fig%.pdf : fig%.svg
 	$(converter)  -o $@ -f pdf $<
 
 fig%.png : fig%.svg
-	$(converter) -w 2048 -o $@ -f png $<
+	$(converter) -w $(pngs_width) -o $@ -f png $<
 
 
 clean:
