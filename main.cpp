@@ -47,6 +47,9 @@ int main( int argc, char * argv [] )
     case 6 :
       fig = new Figure6_SuplPara();
       break ;
+    case 7 :
+      fig = new Figure7_PSA();
+      break ;
     default:
       cerr << "valor entero fuera de rango en el primer argumento (" << argv[1] << ")" << endl ;
       return 1 ;

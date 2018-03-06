@@ -69,4 +69,11 @@ class Figure6_SuplPara : public Figure
   Figure6_SuplPara();
 };
 
+// -----------------------------------------------------------------------------
+
+class Figure7_PSA : public Figure
+{
+  public:
+  Figure7_PSA();
+};
 #endif

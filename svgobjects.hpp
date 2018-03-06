@@ -72,8 +72,7 @@ class Camera
 
 // *****************************************************************************
 // SVGContext:
-// información de contexto para dibujar con SVG (por ahora, tiene un stream)
-// (se le puede añadir el nombre del stream de salida)
+// context information (actualy,  just a stream)
 
 class SVGContext
 {
@@ -99,6 +98,9 @@ class PathStyle
   real  lines_width ;
   real  fill_opacity ;    // fill opacity when draw_filled == true (0->transparent; 1->opaque)
   bool  dashed_lines  ;   // when draw_lines == true, draw dashed lines (yes/no)
+
+  bool use_grad_fill ; // use gradient fill (when draw_filled == true)
+  std::string grad_fill_name ; // name to use for gradient fill
 
 
 } ;
@@ -184,7 +186,23 @@ class Sphere : public Object
    real radius3D,  // original radius
         radius2D ; // projected radius (==radius3D actually)
    vec3 center3D ;
-   vec2 center2D ; // si proyectado == true, center en 2D
+   vec2 center2D ; // when proyectado == true, 2D center
+};
+
+// *****************************************************************************
+// class Hemisphere
+// A filled hemisphere in 3D, drawn as 2 semicircles
+
+class Hemisphere : public Polygon
+{
+   public:
+   Hemisphere( const vec3 & pcenter3D, real pradius3D, vec3 p_view_dir ) ;
+
+   real radius3D,  // original radius
+        radius2D ; // projected radius (==radius3D actually)
+   vec3 center3D ,
+        view_dir ; // view direction, it is used to align the semicircles
+   vec2 center2D ; // when proyectado == true, 2D center
 };
 
 // *****************************************************************************
@@ -379,6 +397,8 @@ class Figure
    Camera     cam ;      // camera used to project all the points
    ObjectsSet objetos ;  // set of objects in the figure
    real       width_cm ; // width (in centimeters) in the SVG header
+
+   std::vector< std::string > rad_fill_grad_names ; // name of radial fill gradients to output
 } ;
 
 #endif

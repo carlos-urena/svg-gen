@@ -306,11 +306,11 @@ Figure6_SuplPara::Figure6_SuplPara()
   // color de la elipse tangente
   vec3 colEllTan = vec3( 0.0,0.6,0.0 );
 
-  Sphere *              pEsfera     = new Sphere( vec3(0.0,0.0,0.0), 1.0 );
-  Ellipse *              pEllipseTan  = new Ellipse( nump, ejez, bt*ejex, at*ejey );
+  Sphere *           pEsfera      = new Sphere( vec3(0.0,0.0,0.0), 1.0 );
+  Ellipse *          pEllipseTan  = new Ellipse( nump, ejez, bt*ejex, at*ejey );
   SpherePolygon *    pEllipseEsf  = new SpherePolygon( *pEllipseTan );
   YCylinderPolygon * pEllipseCilY = new YCylinderPolygon( *pEllipseTan );
-  Ellipse *              pcd = new Ellipse( nump, vec3(0.0,1.0,0.0), ejex, ejez );
+  Ellipse *          pcd          = new Ellipse( nump, vec3(0.0,1.0,0.0), ejex, ejez );
 
   // style de la elipse tangente
   pEllipseTan->style.lines_width = 0.015 ;
@@ -333,7 +333,7 @@ Point * pbt0 = new Point( vec3(-bt,0.0,1.0), colEllTan ),
   const float widthatbt = 0.008 ;
 
   Segment * segbt = new Segment( *pbt0, *pbt1, widthatbt ),
-           * segat = new Segment( *pat0, *pat1, widthatbt );
+          * segat = new Segment( *pat0, *pat1, widthatbt );
 
   // points t0 y t1, s0 y s1
   const real x  = 0.7*bt ,
@@ -341,9 +341,9 @@ Point * pbt0 = new Point( vec3(-bt,0.0,1.0), colEllTan ),
              y  = at*real(sqrt(1.0-x2/bt2));
 
   const vec3 colpt0t1 = pEllipseTan->style.lines_color ;
-  const vec3 vpt0 = vec3(x,-y,1.0),
-            vptm = vec3(x,0.0,1.0),
-             vpt1 = vec3(x,+y,1.0);
+  const vec3 vpt0     = vec3(x,-y,1.0),
+             vptm     = vec3(x,0.0,1.0),
+             vpt1     = vec3(x,+y,1.0);
 
   Point * pt0 = new Point( vpt0, colpt0t1 ),
         * ptm = new Point( vptm, colpt0t1 ),
@@ -416,4 +416,30 @@ Point * pbt0 = new Point( vec3(-bt,0.0,1.0), colEllTan ),
   //objetos.add( pEllipseCilY );
 
 
+}
+
+// ***********************************************************************
+
+Figure7_PSA::Figure7_PSA()
+{
+
+   const vec3 org    = vec3(0.0,0.0,0.0),
+              ejex   = vec3(1.0,0.0,0.0),
+              ejey   = vec3(0.0,1.0,0.0),
+              ejez   = vec3(0.0,0.0,1.0),
+              observ = vec3(-0.6,0.5,1.0),
+              lookat = vec3(0.0,0.0,0.0),
+              vup    = vec3(0.0,1.0,0.0);
+
+   cam = Camera( lookat, observ, vup );
+
+   rad_fill_grad_names.push_back("radfill1");
+
+   auto * hemi = new Hemisphere( org, 1.0, (lookat-observ).normalized() ) ;
+   auto * elli = new Ellipse( 256, org, ejex, ejez );
+
+   elli->style.lines_color = vec3(0.8,0.0,0.0); //
+
+   objetos.add( hemi );
+   objetos.add( elli );
 }

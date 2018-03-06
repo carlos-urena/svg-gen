@@ -26,6 +26,17 @@
 
 // -----------------------------------------------------------------------------
 
+void write_radial_gradient_def( std::ostream & os, const std::string & name )
+{
+   using namespace std ;
+   os << "<radialGradient id='" << name << "' cx='50%' cy='50%' r='50%' fx='25%' fy='75%'>" << endl
+      << "   <stop offset='0%'   style='stop-color:rgb(100%,100%,100%); stop-opacity:0.2' />" << endl
+      << "   <stop offset='100%' style='stop-color:rgb(20%,20%,20%);    stop-opacity:0.2' />" << endl
+      << "</radialGradient>" << endl ;
+}
+
+// -----------------------------------------------------------------------------
+
 void write_color( std::ostream & os, const vec3 & col )
 {
 
@@ -143,6 +154,9 @@ PathStyle::PathStyle()
   fill_opacity = 0.5 ;
   lines_width  = 0.05 ;
   dashed_lines = false ;
+
+  use_grad_fill = false ;
+  grad_fill_name = "no name" ;
 }
 // -----------------------------------------------------------------------------
 
@@ -151,28 +165,41 @@ void PathStyle::writeSVG( SVGContext & ctx )
   using namespace std ;
   std::ostream & os = *(ctx.os) ;
 
-  os << "   style='" ;
+   os << "   style='" ;
 
-  os << "fill:" ;
-  if ( draw_filled )  write_color( os, fill_color ) ;
-  else os << "none" ;
-  os << "; " ;
+   os << "fill:" ;
+   if ( draw_filled )
+   {
+      if ( use_grad_fill )
+      {
+         if ( grad_fill_name == "no name" )
+            cout << "WARNING: using 'no name' as grad fill name." << endl ;
+         os << "url(#" << grad_fill_name ")" ;
+      }
+      else
+         write_color( os, fill_color ) ;
+   }
+   else
+      os << "none" ;
+   os << "; " ;
 
-  if ( draw_filled )
-    os << "fill-opacity:" << fill_opacity << "; " ;
+   if ( draw_filled )
+      os << "fill-opacity:" << fill_opacity << "; " ;
 
-  os << "stroke:" ;
-  if ( draw_lines ) write_color( os, lines_color ) ;
-  else os << "none" ;
-  os << "; " ;
+   os << "stroke:" ;
+   if ( draw_lines )
+      write_color( os, lines_color ) ;
+   else
+      os << "none" ;
+   os << "; " ;
 
-  if ( draw_lines )
-    os << "stroke-width:" << lines_width << "; " ;
+   if ( draw_lines )
+      os << "stroke-width:" << lines_width << "; " ;
 
-  if ( draw_lines && dashed_lines )
-    os << "stroke-dasharray:0.01,0.01; " ;
+   if ( draw_lines && dashed_lines )
+      os << "stroke-dasharray:0.01,0.01; " ;
 
-  os << "' " << endl ;
+   os << "' " << endl ;
 
 }
 
@@ -383,12 +410,14 @@ Sphere::Sphere( const vec3 & pcenter3D, real pradius3D )
 void Sphere::project( const Camera & cam )
 {
   center2D = cam.project( center3D );
-  radius2D  = radius3D ; // err.......
+  radius2D  = radius3D ; // this works fine only assuming parallel projection
 
   projected = true ;
   min = center2D-vec2(radius2D,radius2D);
   max = center2D+vec2(radius2D,radius2D);
 }
+
+
 // -----------------------------------------------------------------------------
 
 void Sphere::drawSVG( SVGContext & ctx )
@@ -398,14 +427,55 @@ void Sphere::drawSVG( SVGContext & ctx )
   using namespace std ;
   std::ostream & os = *(ctx.os) ;
 
-
-  os << "<radialGradient id='grad1' cx='50%' cy='50%' r='50%' fx='25%' fy='75%'>" << endl
-     << "   <stop offset='0%'   style='stop-color:rgb(100%,100%,100%); stop-opacity:0.2' />" << endl
-     << "   <stop offset='100%' style='stop-color:rgb(20%,20%,20%);    stop-opacity:0.2' />" << endl
-     << "</radialGradient>" << endl ;
+  write_radial_gradient_def( os, "grad1" );
 
   os << "<circle " << endl
      << "   style='fill:url(#grad1); stroke:black; stroke-width:0.003'" << endl
+     << "   cx='" << center2D[0] <<  "' cy='" << center2D[1] << "' r='" << radius2D << "'" << endl
+     << "/>" << endl ;
+}
+
+// *****************************************************************************
+// class Hemiphere : public Object
+// -----------------------------------------------------------------------------
+
+Hemisphere::Hemisphere( const vec3 & pcenter3D, real pradius3D, vec3 p_view_dir )
+{
+  radius3D = pradius3D ;
+  center3D = pcenter3D ;
+  view_dir = p_view_dir ;
+}
+// -----------------------------------------------------------------------------
+
+void Hemisphere::project( const Camera & cam )
+{
+  center2D = cam.project( center3D );
+  radius2D  = radius3D ; // err.......
+
+  projected = true ;
+  min = center2D-vec2(radius2D,radius2D);
+  max = center2D+vec2(radius2D,radius2D);
+}
+// -----------------------------------------------------------------------------
+
+void Hemisphere::drawSVG( SVGContext & ctx )
+{
+  assert( projected );
+
+  using namespace std ;
+  std::ostream & os = *(ctx.os) ;
+
+
+
+  /**
+  os << "<radialGradient id='gradhemi' cx='50%' cy='50%' r='50%' fx='25%' fy='75%'>" << endl
+     << "   <stop offset='0%'   style='stop-color:rgb(100%,100%,100%); stop-opacity:0.2' />" << endl
+     << "   <stop offset='100%' style='stop-color:rgb(20%,20%,20%);    stop-opacity:0.2' />" << endl
+     << "</radialGradient>" << endl ;
+  **/
+
+  os << "<circle " << endl
+     << "   style='fill:url(#gradHemi1); stroke:black; stroke-width:0.003'" << endl
      << "   cx='" << center2D[0] <<  "' cy='" << center2D[1] << "' r='" << radius2D << "'" << endl
      << "/>" << endl ;
 }
@@ -452,7 +522,7 @@ Segment::Segment( const Point & p0, const Point & p1, real width )
 
 // *****************************************************************************
 // class Ellipse
-// una elipse puesta en cualquier lugar, de cualquier dimensión
+// an arbitrary ellipse, at any point, with any orientation
 
 Ellipse::Ellipse( unsigned n, const vec3 & center, const vec3 & eje1, const vec3 eje2 )
 {
@@ -814,6 +884,12 @@ void Figure::drawSVG( const std::string & nombre_arch )
         << "     width='" << wx << "cm' height='" << wy << "cm' " << endl
         << "     viewBox='" << box_min[0] << " " << box_min[1] << " " << box_w[0] << " " << box_w[1] << "'" << endl
         << ">" << endl ;
+
+   // output radial gradient fill names (if any)
+   for( auto name :  rad_fill_grad_names )
+   {
+      
+   }
 
    fout << "<g transform='translate(0.0 " << real(2.0)*box_min[1]+box_w[1] << ") scale(1.0 -1.0)'> <!-- transf global (inv y) -->"<< endl ;
 
