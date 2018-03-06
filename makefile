@@ -4,7 +4,7 @@
 srcs        := $(wildcard *.cpp)
 headers     := $(wildcard *.hpp)
 objects     := $(addsuffix .o, $(basename $(srcs)))
-exefile     := main
+exefile     := main_exe
 comp        := clang++
 comp_flags  := -std=c++11 -Wfatal-errors
 converter   := rsvg-convert -a
@@ -52,4 +52,4 @@ fig%.png : fig%.svg
 
 
 clean:
-	rm -f $(objects) $(exefile) fig*.pdf fig*.svg fig*.png
+	rm -f $(objects) $(exefile) *_exe fig*.pdf fig*.svg fig*.png
