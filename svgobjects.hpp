@@ -193,7 +193,9 @@ class Sphere : public Object
 // class Hemisphere
 // A filled hemisphere in 3D, drawn as 2 semicircles
 
-class Hemisphere : public Polygon
+
+
+class Hemisphere : public ObjectsSet
 {
    public:
    Hemisphere( const vec3 & pcenter3D, real pradius3D, vec3 p_view_dir ) ;
@@ -203,6 +205,8 @@ class Hemisphere : public Polygon
    vec3 center3D ,
         view_dir ; // view direction, it is used to align the semicircles
    vec2 center2D ; // when proyectado == true, 2D center
+
+   Polygon contour ;
 };
 
 // *****************************************************************************

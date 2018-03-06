@@ -427,19 +427,20 @@ Figure7_PSA::Figure7_PSA()
               ejex   = vec3(1.0,0.0,0.0),
               ejey   = vec3(0.0,1.0,0.0),
               ejez   = vec3(0.0,0.0,1.0),
-              observ = vec3(-0.6,0.5,1.0),
+              observ = vec3(0.6,0.8,1.0),
               lookat = vec3(0.0,0.0,0.0),
               vup    = vec3(0.0,1.0,0.0);
 
    cam = Camera( lookat, observ, vup );
 
-   rad_fill_grad_names.push_back("radfill1");
+   rad_fill_grad_names.push_back("hemisphereGradFill");
 
-   auto * hemi = new Hemisphere( org, 1.0, (lookat-observ).normalized() ) ;
-   auto * elli = new Ellipse( 256, org, ejex, ejez );
+   auto * hemip = new Hemisphere( org, 1.0, (observ-lookat).normalized() ) ;
+   objetos.add( hemip );
 
-   elli->style.lines_color = vec3(0.8,0.0,0.0); //
+   //auto * elli = new Ellipse( 256, org, ejex, ejez );
+   //elli->style.lines_color = vec3(0.8,0.0,0.0); //
 
-   objetos.add( hemi );
-   objetos.add( elli );
+
+   //objetos.add( elli );
 }

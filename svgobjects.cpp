@@ -174,7 +174,7 @@ void PathStyle::writeSVG( SVGContext & ctx )
       {
          if ( grad_fill_name == "no name" )
             cout << "WARNING: using 'no name' as grad fill name." << endl ;
-         os << "url(#" << grad_fill_name ")" ;
+         os << "url(#" << grad_fill_name << ")" ;
       }
       else
          write_color( os, fill_color ) ;
@@ -306,7 +306,15 @@ Polygon::~Polygon()
 
 void Polygon::drawSVG( SVGContext & ctx )
 {
-  assert( ctx.os != nullptr );
+   using namespace std ;
+   assert( ctx.os != nullptr );
+
+
+   if ( points3D.size() == 0 )
+   {
+      cout << "WARNING: attempting to draw an empty Polygon object" << endl ;
+      return ;
+   }
 
   assert( projected );
   assert( points3D.size() == points2D.size() );
@@ -441,44 +449,81 @@ void Sphere::drawSVG( SVGContext & ctx )
 
 Hemisphere::Hemisphere( const vec3 & pcenter3D, real pradius3D, vec3 p_view_dir )
 {
-  radius3D = pradius3D ;
-  center3D = pcenter3D ;
-  view_dir = p_view_dir ;
+
+
+   radius3D = pradius3D ;
+   center3D = pcenter3D ;
+   view_dir = p_view_dir ;
+
+   const vec3 view_dir_norm = view_dir.normalized(),
+              proj_view_dir = vec3( view_dir[0], 0.0, view_dir[2] ),
+              axisz         = proj_view_dir.normalized(),
+              axisy         = vec3( 0.0, 1.0, 0.0 ),
+              axisx         = vec3( -axisz[2], 0.0, axisz[0] ) ;
+
+      auto * contour = new Polygon();
+
+    // add points in the equator
+    const int np = 128 ;
+
+    // semicircunference (front side of the equator) (perp. to Y)
+    for( int i = 0 ; i < np ; i++ )
+    {
+       const float angr = M_PI*float(i)/float(np);
+       contour->points3D.push_back( center3D + radius3D*( -cos(angr)*axisx + sin(angr)*axisz )  );
+    }
+
+
+    // semicircunference perp. to Z
+
+    const vec3
+      axisy_rot = axisx.cross( view_dir_norm ).normalized(); // axisY, but perp. to view dir
+
+    for( int i = 0 ; i < np ; i++ )
+    {
+       const float angr = M_PI*float(i)/float(np);
+       contour->points3D.push_back( center3D + radius3D*(cos(angr)*axisx + sin(angr)*axisy_rot)  );
+    }
+
+    contour->style.draw_filled = true ;
+    contour->style.use_grad_fill = true ;
+    contour->style.grad_fill_name = "hemisphereGradFill" ;
+
+    contour->style.draw_lines  = true ;
+    contour->style.lines_width = 0.0035 ;
+    contour->style.lines_color = vec3( 0.5, 0.5, 0.5 );
+    contour->style.close_lines = true ;
+
+
+   // back side of the equator (dashed) (perp to Y)
+
+   auto * equator = new Polygon();
+
+   // semicircunference at the equator (perp. to view_dir) (equalt to contour equator)
+   for( int i = 0 ; i <= np ; i++ )
+   {
+      const float angr = M_PI*float(i)/float(np);
+      equator->points3D.push_back( center3D + radius3D*( -cos(angr)*axisx - sin(angr)*axisz )  );
+   }
+
+   equator->style.draw_filled = false ;
+   equator->style.draw_lines  = true ;
+   equator->style.dashed_lines = true ; /// dashed!
+   equator->style.lines_width = contour->style.lines_width ;
+   equator->style.lines_color = contour->style.lines_color;
+   equator->style.close_lines = false ;
+
+   // axes
+
+   add( new Axes( 0.005 ) );
+
+   // add objects to this object set
+   add( equator );
+   add( contour );
+
+
 }
-// -----------------------------------------------------------------------------
 
-void Hemisphere::project( const Camera & cam )
-{
-  center2D = cam.project( center3D );
-  radius2D  = radius3D ; // err.......
-
-  projected = true ;
-  min = center2D-vec2(radius2D,radius2D);
-  max = center2D+vec2(radius2D,radius2D);
-}
-// -----------------------------------------------------------------------------
-
-void Hemisphere::drawSVG( SVGContext & ctx )
-{
-  assert( projected );
-
-  using namespace std ;
-  std::ostream & os = *(ctx.os) ;
-
-
-
-  /**
-  os << "<radialGradient id='gradhemi' cx='50%' cy='50%' r='50%' fx='25%' fy='75%'>" << endl
-     << "   <stop offset='0%'   style='stop-color:rgb(100%,100%,100%); stop-opacity:0.2' />" << endl
-     << "   <stop offset='100%' style='stop-color:rgb(20%,20%,20%);    stop-opacity:0.2' />" << endl
-     << "</radialGradient>" << endl ;
-  **/
-
-  os << "<circle " << endl
-     << "   style='fill:url(#gradHemi1); stroke:black; stroke-width:0.003'" << endl
-     << "   cx='" << center2D[0] <<  "' cy='" << center2D[1] << "' r='" << radius2D << "'" << endl
-     << "/>" << endl ;
-}
 
 // *****************************************************************************
 // class Segment
@@ -864,7 +909,7 @@ void Figure::drawSVG( const std::string & nombre_arch )
    ctx.os = &fout ;
 
    constexpr real fmrg = 0.01 ; // width del margen en X y en Y, expresado en porcentaje del width en X
-   cout << "objetos.min == " << objetos.max << ", objetos.max == " << objetos.min << endl ;
+   //cout << "objetos.min == " << objetos.max << ", objetos.max == " << objetos.min << endl ;
 
    const real ax       = objetos.max[0]-objetos.min[0] ;
    const vec2 vmargen  = vec2( fmrg*ax, fmrg*ax );
@@ -886,10 +931,8 @@ void Figure::drawSVG( const std::string & nombre_arch )
         << ">" << endl ;
 
    // output radial gradient fill names (if any)
-   for( auto name :  rad_fill_grad_names )
-   {
-      
-   }
+   for( auto & name :  rad_fill_grad_names )
+      write_radial_gradient_def( fout, name );
 
    fout << "<g transform='translate(0.0 " << real(2.0)*box_min[1]+box_w[1] << ") scale(1.0 -1.0)'> <!-- transf global (inv y) -->"<< endl ;
 
@@ -901,6 +944,8 @@ void Figure::drawSVG( const std::string & nombre_arch )
    fout << "</svg>" << endl ;
 
    fout.close();
+
+   cout << "end svg " << nombre_arch << endl ;
 }
 
 //******************************************************************************
