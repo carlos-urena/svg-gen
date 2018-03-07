@@ -351,7 +351,7 @@ class SpherePolygon : public Polygon
 class HorPlanePolygon : public Polygon
 {
   public:
-  HorPlanePolygon( const Polygon & orig ) ;
+  HorPlanePolygon( const Polygon & orig, bool clip_neg ) ;
 };
 
 // *****************************************************************************

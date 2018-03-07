@@ -415,7 +415,7 @@ void FigurePSA_Base::initialize(  )
               ejex   = vec3(1.0,0.0,0.0),
               ejey   = vec3(0.0,1.0,0.0),
               ejez   = vec3(0.0,0.0,1.0),
-              observ = vec3(0.6,0.4,1.0),
+              observ = vec3(1.2,0.6,1.0),
               lookat = vec3(0.0,0.0,0.0),
               vup    = vec3(0.0,1.0,0.0);
 
@@ -424,12 +424,19 @@ void FigurePSA_Base::initialize(  )
 
    // create objects
    auto * sphere_cap    = new SpherePolygon( *original_pol, true );
-   auto * hor_plane_pol = new HorPlanePolygon( *sphere_cap );
+   auto * hor_plane_pol = new HorPlanePolygon( *sphere_cap, true );
    auto * hemisphere    = new Hemisphere( org, 1.0, (observ-lookat).normalized() ) ;
 
    sphere_cap->style.use_grad_fill = true ;
    sphere_cap->style.fill_opacity = 0.5 ;
    sphere_cap->style.grad_fill_name = "spherecapGradFill" ;
+
+   auto * dashed_ellipse = new HorPlanePolygon( *original_pol, false );
+   dashed_ellipse->style.draw_filled = false ;
+   dashed_ellipse->style.draw_lines = true ;
+   dashed_ellipse->style.dashed_lines = true ;
+   objetos.add( dashed_ellipse );
+
 
    // add objects to set
 
@@ -442,6 +449,8 @@ void FigurePSA_Base::initialize(  )
    objetos.add( hemisphere );
    objetos.add( sphere_cap );
    objetos.add( hor_plane_pol );
+
+
 }
 // ***********************************************************************
 
@@ -474,8 +483,8 @@ Figure8_PSA_ellipse::Figure8_PSA_ellipse()
 {
    // configure base class
 
-   disk_center = vec3( 3.0, 3.0, 0.0 );
-   disk_radius = 2.2 ;
+   disk_center = vec3( 3.0, 3.5, 0.0 );
+   disk_radius = 3.0 ;
    draw_projectors = true ;
 
    // create original disk
@@ -498,8 +507,8 @@ Figure9_PSA_ellipse_lune::Figure9_PSA_ellipse_lune()
 {
    // configure base class
 
-   disk_center = vec3( 3.0, 3.0, 0.0 );
-   disk_radius = 2.2 ;
+   disk_center = vec3( 3.0, 1.0, 0.0 );
+   disk_radius = 5.0 ;
    draw_projectors = true ;
 
    // create original disk
@@ -522,9 +531,9 @@ Figure10_PSA_lune::Figure10_PSA_lune()
 {
    // configure base class
 
-   disk_center = vec3( 3.0, 3.0, 0.0 );
-   disk_radius = 2.2 ;
-   draw_projectors = true ;
+   disk_center = vec3( 3.0, -1.0, 0.0 );
+   disk_radius = 5.0 ;
+   draw_projectors = false ;
 
    // create original disk
    const vec3

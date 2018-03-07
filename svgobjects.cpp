@@ -997,7 +997,7 @@ SpherePolygon::SpherePolygon( const Polygon & orig, bool clip )
 // class HorPlanePolygon
 // -----------------------------------------------------------------------------
 
-HorPlanePolygon::HorPlanePolygon( const Polygon & orig )
+HorPlanePolygon::HorPlanePolygon( const Polygon & orig, bool clip_neg )
 {
   style.draw_lines   = true ;
   style.draw_filled  = true ;
@@ -1014,9 +1014,9 @@ HorPlanePolygon::HorPlanePolygon( const Polygon & orig )
       const vec3 sph_pnt = orig_pnt.normalized() ,    // sphere point
                  pln_pnt = { sph_pnt[0], 0.0, sph_pnt[2] };   // plane point
 
-      if ( 0.0 <= sph_pnt[1] ) // if it is in upper hemisphere, just project
+      if ( !clip_neg || 0.0 <= sph_pnt[1] ) // if it is in upper hemisphere, just project
          points3D.push_back( pln_pnt );
-      else // if in lower hemisphere
+      else // if in lower hemisphere, project to the circunference
          points3D.push_back( pln_pnt.normalized() );
   }
 }

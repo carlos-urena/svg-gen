@@ -27,13 +27,13 @@ else
 endif
 
 x%: fig%.pdf
-	$(pdfviewer) $<
+	$(pdfviewer) $< &
 
 y%: fig%.png
-	$(pngviewer) $<
+	$(pngviewer) $< &
 
 z%: fig%.svg
-	$(svgviewer) $<
+	$(svgviewer) $< &
 
 fig%.svg: $(exefile)
 	./$(exefile) $* $@

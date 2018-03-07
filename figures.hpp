@@ -80,6 +80,7 @@ class FigurePSA_Base : public Figure
   vec3  disk_center ;
   float disk_radius  ;
   bool  draw_projectors ;
+  bool  clip_neg ;
   Polygon * original_pol ;
 };
 
