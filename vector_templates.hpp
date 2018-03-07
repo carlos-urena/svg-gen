@@ -136,6 +136,11 @@ class VectorTempl2 : public VectorTempl<T,2>
    VectorTempl2( const T & c0, const T & c1 ) ;
    VectorTempl2( const VectorTempl<T,2> & ini );
    void operator = ( const VectorTempl<T,2> & der ) ;
+
+   friend inline VectorTempl2<T> operator * ( T x, const VectorTempl2<T> & v )
+   {
+      return v*x ;
+   }
 } ;
 
 
@@ -159,6 +164,11 @@ class VectorTempl3 : public VectorTempl<T,3>
    VectorTempl3( const VectorTempl<T,3> & ini );
    void operator = ( const VectorTempl<T,3> & der ) ;
    void operator = ( const VectorTempl<T,4> & der ) ; // asignar ignorando ultimo
+
+   friend inline VectorTempl3<T> operator * ( T x, const VectorTempl3<T> & v )
+   {
+      return v*x ;
+   }
 
    // producto vectorial (cross)  a = v1.cross(v2)
    VectorTempl3<T> cross( const VectorTempl3<T> & v2 ) const ;

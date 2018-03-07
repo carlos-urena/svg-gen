@@ -484,9 +484,7 @@ Hemisphere::Hemisphere( const vec3 & pcenter3D, real pradius3D, vec3 p_view_dir 
        contour->points3D.push_back( center3D + radius3D*( -cos(angr)*axisx + sin(angr)*axisz )  );
     }
 
-
     // semicircunference perp. to Z
-
     const vec3
       axisy_rot = axisx.cross( view_dir_norm ).normalized(); // axisY, but perp. to view dir
 
@@ -962,7 +960,7 @@ void Figure::drawSVG( const std::string & nombre_arch )
 
    fout.close();
 
-   cout << "end svg " << nombre_arch << endl ;
+   //cout << "end svg " << nombre_arch << endl ;
 }
 
 //******************************************************************************

@@ -17,13 +17,13 @@ all_svgs      := $(addsuffix .svg, $(all_basenames))
 uname:=$(shell uname -s)
 
 ifeq ($(uname),Darwin)
-	pdfviewer := open
-	pngviewer := open
-	svgviewer := open
+   pdfviewer := open
+   pngviewer := open
+   svgviewer := open
 else
-	pdfviewer  := evince
-	pngviewer  := evince
-	svgviewver := evince
+   pdfviewer  := evince
+   pngviewer  := eog
+   svgviewer := eog
 endif
 
 x%: fig%.pdf
