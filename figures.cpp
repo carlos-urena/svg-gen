@@ -390,10 +390,6 @@ Point * pbt0 = new Point( vec3(-bt,0.0,1.0), colEllTan ),
   objetos.add( segbt );
   objetos.add( segat );
 
-
-  //objetos.add( pEllipseEsf );
-
-
   objetos.add( segpt0pt1 );
   objetos.add( segm );
   objetos.add( segx );
@@ -407,40 +403,138 @@ Point * pbt0 = new Point( vec3(-bt,0.0,1.0), colEllTan ),
   objetos.add( pt1 );
   objetos.add( ps0 );
   objetos.add( ps1 );
-  /**
-
-
-
-  **/
-
-  //objetos.add( pEllipseCilY );
-
 
 }
 
 // ***********************************************************************
 
-Figure7_PSA::Figure7_PSA()
+void FigurePSA_Base::initialize(  )
 {
 
    const vec3 org    = vec3(0.0,0.0,0.0),
               ejex   = vec3(1.0,0.0,0.0),
               ejey   = vec3(0.0,1.0,0.0),
               ejez   = vec3(0.0,0.0,1.0),
-              observ = vec3(0.6,0.8,1.0),
+              observ = vec3(0.6,0.4,1.0),
               lookat = vec3(0.0,0.0,0.0),
               vup    = vec3(0.0,1.0,0.0);
 
    cam = Camera( lookat, observ, vup );
 
-   rad_fill_grad_names.push_back("hemisphereGradFill");
 
-   auto * hemip = new Hemisphere( org, 1.0, (observ-lookat).normalized() ) ;
-   objetos.add( hemip );
+   // create objects
+   auto * sphere_cap    = new SpherePolygon( *original_pol, true );
+   auto * hor_plane_pol = new HorPlanePolygon( *sphere_cap );
+   auto * hemisphere    = new Hemisphere( org, 1.0, (observ-lookat).normalized() ) ;
 
-   //auto * elli = new Ellipse( 256, org, ejex, ejez );
-   //elli->style.lines_color = vec3(0.8,0.0,0.0); //
+   sphere_cap->style.use_grad_fill = true ;
+   sphere_cap->style.fill_opacity = 0.5 ;
+   sphere_cap->style.grad_fill_name = "spherecapGradFill" ;
+
+   // add objects to set
+
+   if ( draw_projectors )
+   {
+      auto * projectors    = new ExtrVertSegm( *sphere_cap, *hor_plane_pol, cam );
+      objetos.add( projectors );
+   }
+
+   objetos.add( hemisphere );
+   objetos.add( sphere_cap );
+   objetos.add( hor_plane_pol );
+}
+// ***********************************************************************
 
 
-   //objetos.add( elli );
+Figure7_PSA_shape::Figure7_PSA_shape()
+{
+   // configure base class
+
+   disk_center = vec3( 3.0, 3.0, 0.0 );
+   disk_radius = 2.2 ;
+   draw_projectors = true ;
+
+   // create original disk
+   const vec3
+      disk_center_norm = disk_center.normalized(),
+      disk_axis_1      = disk_center.cross( {0.0,1.0,0.0} ).normalized(),
+      disk_axis_2      = disk_axis_1.cross( disk_center_norm  ).normalized() ;
+
+   original_pol = new Ellipse( 256, disk_center, disk_radius*disk_axis_1,
+                                                 disk_radius*disk_axis_2 );
+
+   // initilize base class
+   initialize();
+}
+
+// ***********************************************************************
+
+
+Figure8_PSA_ellipse::Figure8_PSA_ellipse()
+{
+   // configure base class
+
+   disk_center = vec3( 3.0, 3.0, 0.0 );
+   disk_radius = 2.2 ;
+   draw_projectors = true ;
+
+   // create original disk
+   const vec3
+      disk_center_norm = disk_center.normalized(),
+      disk_axis_1      = disk_center.cross( {0.0,1.0,0.0} ).normalized(),
+      disk_axis_2      = disk_axis_1.cross( disk_center_norm  ).normalized() ;
+
+   original_pol = new Ellipse( 256, disk_center, disk_radius*disk_axis_1,
+                                                 disk_radius*disk_axis_2 );
+
+   // initilize base class
+   initialize();
+}
+
+// ***********************************************************************
+
+
+Figure9_PSA_ellipse_lune::Figure9_PSA_ellipse_lune()
+{
+   // configure base class
+
+   disk_center = vec3( 3.0, 3.0, 0.0 );
+   disk_radius = 2.2 ;
+   draw_projectors = true ;
+
+   // create original disk
+   const vec3
+      disk_center_norm = disk_center.normalized(),
+      disk_axis_1      = disk_center.cross( {0.0,1.0,0.0} ).normalized(),
+      disk_axis_2      = disk_axis_1.cross( disk_center_norm  ).normalized() ;
+
+   original_pol = new Ellipse( 256, disk_center, disk_radius*disk_axis_1,
+                                                 disk_radius*disk_axis_2 );
+
+   // initilize base class
+   initialize();
+}
+
+// ***********************************************************************
+
+
+Figure10_PSA_lune::Figure10_PSA_lune()
+{
+   // configure base class
+
+   disk_center = vec3( 3.0, 3.0, 0.0 );
+   disk_radius = 2.2 ;
+   draw_projectors = true ;
+
+   // create original disk
+   const vec3
+      disk_center_norm = disk_center.normalized(),
+      disk_axis_1      = disk_center.cross( {0.0,1.0,0.0} ).normalized(),
+      disk_axis_2      = disk_axis_1.cross( disk_center_norm  ).normalized() ;
+
+   original_pol = new Ellipse( 256, disk_center, disk_radius*disk_axis_1,
+                                                 disk_radius*disk_axis_2 );
+
+   // initilize base class
+   initialize();
 }

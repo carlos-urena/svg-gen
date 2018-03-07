@@ -71,9 +71,53 @@ class Figure6_SuplPara : public Figure
 
 // -----------------------------------------------------------------------------
 
-class Figure7_PSA : public Figure
+class FigurePSA_Base : public Figure
 {
   public:
-  Figure7_PSA();
+  FigurePSA_Base() {}
+  void initialize();
+
+  vec3  disk_center ;
+  float disk_radius  ;
+  bool  draw_projectors ;
+  Polygon * original_pol ;
 };
+
+// -----------------------------------------------------------------------------
+
+
+class Figure7_PSA_shape : public FigurePSA_Base
+{
+   public:
+   Figure7_PSA_shape();
+} ;
+
+// -----------------------------------------------------------------------------
+
+
+class Figure8_PSA_ellipse : public FigurePSA_Base
+{
+   public:
+   Figure8_PSA_ellipse();
+} ;
+
+
+// -----------------------------------------------------------------------------
+
+
+class Figure9_PSA_ellipse_lune : public FigurePSA_Base
+{
+   public:
+   Figure9_PSA_ellipse_lune();
+} ;
+
+// -----------------------------------------------------------------------------
+
+
+class Figure10_PSA_lune : public FigurePSA_Base
+{
+   public:
+   Figure10_PSA_lune();
+} ;
+
 #endif

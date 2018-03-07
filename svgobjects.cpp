@@ -37,6 +37,17 @@ void write_radial_gradient_def( std::ostream & os, const std::string & name )
 
 // -----------------------------------------------------------------------------
 
+void write_radial_gradient_def_blue( std::ostream & os, const std::string & name )
+{
+   using namespace std ;
+   os << "<radialGradient id='" << name << "' cx='50%' cy='50%' r='50%' fx='50%' fy='50%'>" << endl
+      << "   <stop offset='0%'   style='stop-color:rgb(100%,100%,100%); stop-opacity:0.2' />" << endl
+      << "   <stop offset='100%' style='stop-color:rgb(0%,0%,50%);    stop-opacity:0.4' />" << endl
+      << "</radialGradient>" << endl ;
+}
+
+// -----------------------------------------------------------------------------
+
 void write_color( std::ostream & os, const vec3 & col )
 {
 
@@ -930,11 +941,17 @@ void Figure::drawSVG( const std::string & nombre_arch )
         << "     viewBox='" << box_min[0] << " " << box_min[1] << " " << box_w[0] << " " << box_w[1] << "'" << endl
         << ">" << endl ;
 
-   // output radial gradient fill names (if any)
-   for( auto & name :  rad_fill_grad_names )
-      write_radial_gradient_def( fout, name );
+
+   //write_radial_gradient_def( fout, "hemisphereGradFill" );
+
+   fout << "<defs>" << endl ;
+   write_radial_gradient_def( fout, "hemisphereGradFill" );
+   write_radial_gradient_def_blue( fout, "spherecapGradFill" );
+   fout << "</defs>" << endl ;
 
    fout << "<g transform='translate(0.0 " << real(2.0)*box_min[1]+box_w[1] << ") scale(1.0 -1.0)'> <!-- transf global (inv y) -->"<< endl ;
+
+
 
    // objetos svg
    objetos.drawSVG( ctx );
@@ -949,27 +966,116 @@ void Figure::drawSVG( const std::string & nombre_arch )
 }
 
 //******************************************************************************
-
-
+// class SpherePolygon
 // -----------------------------------------------------------------------------
 
-SpherePolygon::SpherePolygon( const Polygon & orig )
+SpherePolygon::SpherePolygon( const Polygon & orig, bool clip )
 {
-  style.draw_lines     = true ;
-  style.draw_filled      = true ;
+  style.draw_lines   = true ;
+  style.draw_filled  = true ;
   style.close_lines  = true ;
-  style.lines_width   = 0.007 ;
+  style.lines_width  = 0.004 ;
   style.fill_opacity = 0.2 ;
-  style.lines_color   = vec3( 0.0, 0.0, 1.0 );
-  style.fill_color    = vec3( 0.0, 0.0, 1.0 );
+  style.lines_color  = vec3( 0.0, 0.0, 1.0 );
+  style.fill_color   = vec3( 0.0, 0.0, 1.0 );
 
   assert( orig.points3D.size() > 0 );
+
   for( unsigned i = 0 ; i < orig.points3D.size() ; i++ )
   {
-    vec3 porg = orig.points3D[i];
-    points3D.push_back( porg.normalized() );
+      vec3 pesf = orig.points3D[i].normalized();
+
+      if ( clip && pesf[1] < 0.0 )
+      {
+         const vec3 pcirc = vec3( pesf[0], 0.0, pesf[2] ).normalized() ;
+         points3D.push_back( pcirc );
+      }
+      else
+         points3D.push_back( pesf );
   }
 }
+
+//******************************************************************************
+// class HorPlanePolygon
+// -----------------------------------------------------------------------------
+
+HorPlanePolygon::HorPlanePolygon( const Polygon & orig )
+{
+  style.draw_lines   = true ;
+  style.draw_filled  = true ;
+  style.close_lines  = true ;
+  style.lines_width  = 0.004 ;
+  style.fill_opacity = 0.2 ;
+  style.lines_color  = vec3( 1.0, 0.0, 0.0 );
+  style.fill_color   = vec3( 1.0, 0.0, 0.0 );
+
+  assert( orig.points3D.size() > 0 );
+  for( auto orig_pnt : orig.points3D )
+  {
+      // project onto sphere (normalize)
+      const vec3 sph_pnt = orig_pnt.normalized() ,    // sphere point
+                 pln_pnt = { sph_pnt[0], 0.0, sph_pnt[2] };   // plane point
+
+      if ( 0.0 <= sph_pnt[1] ) // if it is in upper hemisphere, just project
+         points3D.push_back( pln_pnt );
+      else // if in lower hemisphere
+         points3D.push_back( pln_pnt.normalized() );
+  }
+}
+
+//******************************************************************************
+// class extreme vertical segments
+
+ExtrVertSegm::ExtrVertSegm( Polygon & pol1, Polygon & pol2, const Camera & cam )
+{
+   using namespace std ;
+   assert( pol1.points3D.size() == pol2.points3D.size() );
+   assert( 1 < pol1.points3D.size() );
+
+   pol1.project( cam );
+   pol2.project( cam );
+
+   int   imin = 0,
+         imax = 0 ;
+   float xmin = pol1.points3D[0][0],
+         xmax = pol2.points3D[0][0];
+
+   for( int i = 1 ; i < pol1.points3D.size() ; i++ )
+   {
+      const float x1 = pol1.points2D[i][0],
+                  x2 = pol2.points2D[i][0] ;
+
+      if ( std::fabs( x1-x2) > 1e-6 )
+         cout << "WARNING! - non vertically aligned vertexes!" << endl ;
+      //cout << "x1 == " << x1 << ", x2 == " << x2 << endl ;
+      if ( x1 < xmin )
+      {
+         imin = i ;
+         xmin = x1 ;
+      }
+      else if ( xmax < x1 )
+      {
+         imax = i ;
+         xmax = x1 ;
+      }
+   }
+
+   auto * smin = new Segment( pol1.points3D[imin], pol2.points3D[imin] );
+   auto * smax = new Segment( pol1.points3D[imax], pol2.points3D[imax] );
+
+   // tweak styles here
+   smin->style.lines_width = 0.003 ;
+   smin->style.lines_color = vec3( 0.4, 0.4, 0.4 );
+
+   smax->style = smin->style ;
+
+   add( smin );
+   add( smax );
+
+
+
+}
+
 
 // -----------------------------------------------------------------------------
 

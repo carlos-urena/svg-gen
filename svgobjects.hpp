@@ -341,8 +341,30 @@ class JoiningQuads : public ObjectsSet
 class SpherePolygon : public Polygon
 {
   public:
-  SpherePolygon( const Polygon & orig ) ;
+  SpherePolygon( const Polygon & orig, bool clip = false ) ;
 };
+
+// *****************************************************************************
+// class HorPlanePolygon
+// a polygon obtained by projecting another one onto the (horizontal) plane at Y=0
+
+class HorPlanePolygon : public Polygon
+{
+  public:
+  HorPlanePolygon( const Polygon & orig ) ;
+};
+
+// *****************************************************************************
+// class ExtrVertSegm
+// two vertical segments joining extreme-X vertexes on two polygons
+// (two polygons of similar size with vertically aligned vertexes)
+
+class ExtrVertSegm : public ObjectsSet
+{
+  public:
+  ExtrVertSegm( Polygon & pol1, Polygon & pol2, const Camera & cam ) ;
+};
+
 
 // *****************************************************************************
 // class YCylinderPoint

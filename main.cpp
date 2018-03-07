@@ -48,10 +48,19 @@ int main( int argc, char * argv [] )
       fig = new Figure6_SuplPara();
       break ;
     case 7 :
-      fig = new Figure7_PSA();
+      fig = new Figure7_PSA_shape();
+      break ;
+    case 8 :
+      fig = new Figure8_PSA_ellipse();
+      break ;
+    case 9 :
+      fig = new Figure9_PSA_ellipse_lune();
+      break ;
+    case 10 :
+      fig = new Figure10_PSA_lune();
       break ;
     default:
-      cerr << "valor entero fuera de rango en el primer argumento (" << argv[1] << ")" << endl ;
+      cerr << "first argument is an out of range number (" << argv[1] << ")" << endl ;
       return 1 ;
   }
 
