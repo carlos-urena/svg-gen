@@ -1,6 +1,12 @@
 ### copied from: https://gist.github.com/octocat/9257657
 ### ---------------------------------------------------
 
+# CUA #
+#######
+
+fig*.pdf
+fig*.svg
+fig*.png
 
 # Compiled source #
 ###################
