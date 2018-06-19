@@ -198,7 +198,7 @@ class Sphere : public Object
 class Hemisphere : public ObjectsSet
 {
    public:
-   Hemisphere( const vec3 & pcenter3D, real pradius3D, vec3 p_view_dir ) ;
+   Hemisphere( const vec3 & pcenter3D, real pradius3D, vec3 p_view_dir, bool flip_axes = false ) ;
 
    real radius3D,  // original radius
         radius2D ; // projected radius (==radius3D actually)
@@ -290,7 +290,7 @@ class SegmentsVert : public ObjectsSet
 class Axes : public ObjectsSet
 {
    public:
-   Axes( real widthl );
+   Axes( real widthl, bool flip = false );
 } ;
 
 // *****************************************************************************
@@ -423,6 +423,7 @@ class Figure
    Camera     cam ;      // camera used to project all the points
    ObjectsSet objetos ;  // set of objects in the figure
    real       width_cm ; // width (in centimeters) in the SVG header
+   bool       flip_axes ; // true to flip axes (see Axes::Axes), false by default
 
    std::vector< std::string > rad_fill_grad_names ; // name of radial fill gradients to output
 } ;

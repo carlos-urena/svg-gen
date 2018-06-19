@@ -420,12 +420,13 @@ void FigurePSA_Base::initialize(  )
               vup    = vec3(0.0,1.0,0.0);
 
    cam = Camera( lookat, observ, vup );
-
+   using namespace std ;
+   cout << "FigurePSA_Base::initialize, flip_axes == " << flip_axes << endl ;
 
    // create objects
    auto * sphere_cap    = new SpherePolygon( *original_pol, true );
    auto * hor_plane_pol = new HorPlanePolygon( *sphere_cap, true );
-   auto * hemisphere    = new Hemisphere( org, 1.0, (observ-lookat).normalized() ) ;
+   auto * hemisphere    = new Hemisphere( org, 1.0, (observ-lookat).normalized(), flip_axes ) ;
 
    sphere_cap->style.use_grad_fill = true ;
    sphere_cap->style.fill_opacity = 0.5 ;
@@ -462,6 +463,7 @@ Figure7_PSA_shape::Figure7_PSA_shape()
    disk_center = vec3( 3.0, 3.0, 0.0 );
    disk_radius = 2.2 ;
    draw_projectors = true ;
+   flip_axes = true ;
 
    // create original disk
    const vec3
@@ -486,6 +488,7 @@ Figure8_PSA_ellipse::Figure8_PSA_ellipse()
    disk_center = vec3( 3.0, 3.5, 0.0 );
    disk_radius = 3.0 ;
    draw_projectors = true ;
+   flip_axes = true ;
 
    // create original disk
    const vec3
@@ -510,6 +513,7 @@ Figure9_PSA_ellipse_lune::Figure9_PSA_ellipse_lune()
    disk_center = vec3( 3.0, 1.0, 0.0 );
    disk_radius = 5.0 ;
    draw_projectors = true ;
+   flip_axes = true ;
 
    // create original disk
    const vec3

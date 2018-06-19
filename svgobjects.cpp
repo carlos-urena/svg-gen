@@ -458,7 +458,7 @@ void Sphere::drawSVG( SVGContext & ctx )
 // class Hemiphere : public Object
 // -----------------------------------------------------------------------------
 
-Hemisphere::Hemisphere( const vec3 & pcenter3D, real pradius3D, vec3 p_view_dir )
+Hemisphere::Hemisphere( const vec3 & pcenter3D, real pradius3D, vec3 p_view_dir, bool flip_axes )
 {
 
 
@@ -524,7 +524,7 @@ Hemisphere::Hemisphere( const vec3 & pcenter3D, real pradius3D, vec3 p_view_dir 
 
    // axes
 
-   add( new Axes( 0.005 ) );
+   add( new Axes( 0.005, flip_axes ) );
 
    // add objects to this object set
    add( equator );
@@ -764,13 +764,22 @@ SegmentsVert::SegmentsVert( unsigned dn, const Polygon & p1, const Polygon & p2 
 // class Axes
 // -----------------------------------------------------------------------------
 
-Axes::Axes( real widthl )  // widthl = width de línea
+Axes::Axes( real widthl, bool flip   )  // widthl = width de línea
 {
   vec3 o = vec3(0.0,0.0,0.0);
 
-  add( new Segment( o, vec3(1.0,0.0,0.0), vec3(1.0,0.0,0.0), widthl ) );
-  add( new Segment( o, vec3(0.0,1.0,0.0), vec3(0.0,0.5,0.0), widthl ) );
-  add( new Segment( o, vec3(0.0,0.0,1.0), vec3(0.0,0.0,1.0), widthl ) );
+  if ( flip )  // draw X and Y in the horizontal plane
+  {
+    add( new Segment( o, vec3(1.0,0.0,0.0),  vec3(1.0,0.7,0.7), widthl ) );
+    add( new Segment( o, vec3(0.0,0.0,-1.0), vec3(0.6,0.7,0.6), widthl ) );
+    add( new Segment( o, vec3(0.0,1.0,0.0),  vec3(0.7,0.7,1.0), widthl ) );
+  }
+  else
+  {
+    add( new Segment( o, vec3(1.0,0.0,0.0), vec3(1.0,0.0,0.0), widthl ) );
+    add( new Segment( o, vec3(0.0,1.0,0.0), vec3(0.0,0.5,0.0), widthl ) );
+    add( new Segment( o, vec3(0.0,0.0,1.0), vec3(0.0,0.0,1.0), widthl ) );
+  }
 }
 
 // *****************************************************************************
@@ -903,6 +912,7 @@ JoiningQuads::JoiningQuads( const Polygon & p1, const Polygon & p2 )
 Figure::Figure()
 {
    width_cm = 20.0 ;
+   flip_axes = false ;
 }
 // -----------------------------------------------------------------------------
 
